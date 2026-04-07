@@ -167,3 +167,9 @@ function shareOnWhatsApp() {
     let msg = `Presupuesto Oh My Nails 💅\nTotal: $${total}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
+
+// función opcional (evita error)
+function guardarEnSheets() {
+    alert("Función de guardado aún no conectada");
+}
+</script>
