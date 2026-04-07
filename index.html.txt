@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Oh My Nails - Presupuesto</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+    background: linear-gradient(135deg, #fdf6f3, #fce7f3);
+}
+</style>
+</head>
+
+<body class="font-sans">
+
+<div class="max-w-4xl mx-auto p-6">
+
+    <!-- LOGO -->
+    <div class="text-center mb-6">
+        <img src="logo.png" class="w-40 mx-auto rounded-full shadow">
+        <h1 class="text-2xl mt-3 tracking-wide text-gray-700">
+            Calculadora de Presupuesto
+        </h1>
+    </div>
+
+    <!-- Técnica -->
+    <div class="bg-white p-4 rounded-xl shadow mb-4">
+        <h2 class="font-semibold mb-2 text-pink-500">Técnica</h2>
+
+        <label class="flex justify-between">
+            <input type="radio" name="tecnica" value="10000" checked onchange="calculateTotal()">
+            <span>Soft Gel</span>
+            <span>$10.000</span>
+        </label>
+
+        <label class="flex justify-between">
+            <input type="radio" name="tecnica" value="12000" onchange="calculateTotal()">
+            <span>Acrílicas</span>
+            <span>$12.000</span>
+        </label>
+    </div>
+
+    <!-- Retiro -->
+    <div class="bg-white p-4 rounded-xl shadow mb-4">
+        <h2 class="font-semibold mb-2 text-pink-500">Retiro</h2>
+
+        <label class="flex justify-between">
+            <input type="radio" name="retiro" value="0" checked onchange="calculateTotal()">
+            <span>Sin retiro</span>
+            <span>$0</span>
+        </label>
+
+        <label class="flex justify-between">
+            <input type="radio" name="retiro" value="2000" onchange="calculateTotal()">
+            <span>Retiro de otro set</span>
+            <span>$2.000</span>
+        </label>
+    </div>
+
+    <!-- Decoraciones -->
+    <div class="bg-white p-4 rounded-xl shadow mb-4">
+        <h2 class="font-semibold mb-2 text-pink-500">Decoraciones</h2>
+        <div id="decoraciones-container" class="space-y-2"></div>
+    </div>
+
+    <!-- Total -->
+    <div class="card p-6 rounded-2xl shadow-xl bg-white text-center">
+        <h2 class="text-lg font-semibold">Total</h2>
+        <div id="total-display" class="text-3xl font-bold text-pink-500 mt-2">$0</div>
+
+        <button onclick="shareOnWhatsApp()" 
+            class="mt-4 bg-green-500 text-white px-4 py-2 rounded-xl w-full">
+            Enviar por WhatsApp
+        </button>
+
+        <button onclick="guardarEnSheets()" 
+            class="mt-2 bg-pink-500 text-white px-4 py-2 rounded-xl w-full">
+            Guardar Cliente
+        </button>
+    </div>
+
+</div>
+
+<script>
+const decoracionesPrices = {
+    liso_strass: 800,
+    relieve_1: 100,
+    relieve_2: 300,
+    aura: 400,
+    french: 200,
+    nailart: 250,
+    strass: 250,
+    cateye: 200,
+    bijou: 200,
+    aniadido: 1000
+};
+
+const nombresDecoraciones = {
+    liso_strass: "Liso completo strass",
+    relieve_1: "Relieve",
+    relieve_2: "Relieve Especial",
+    aura: "Aura",
+    french: "French",
+    nailart: "Nail Art",
+    strass: "Strass",
+    cateye: "Cat Eye",
+    bijou: "Bijouterie",
+    aniadido: "Añadido de uña"
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('decoraciones-container');
+
+    for (let key in decoracionesPrices) {
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center";
+
+        div.innerHTML = `
+            <span>${nombresDecoraciones[key]}</span>
+            <div class="flex items-center gap-2">
+                <button onclick="changeQty('${key}', -1)">-</button>
+                <input id="${key}" value="0" class="w-10 text-center border rounded">
+                <button onclick="changeQty('${key}', 1)">+</button>
+            </div>
+        `;
+
+        container.appendChild(div);
+    }
+
+    calculateTotal();
+});
+
+function changeQty(id, delta) {
+    const input = document.getElementById(id);
+    let val = parseInt(input.value) + delta;
+    if (val < 0) val = 0;
+    if (val > 10) val = 10;
+    input.value = val;
+    calculateTotal();
+}
+
+function calculateTotal() {
+    let total = 0;
+
+    const tecnica = document.querySelector('input[name="tecnica"]:checked');
+    total += parseInt(tecnica.value);
+
+    const retiro = document.querySelector('input[name="retiro"]:checked');
+    total += parseInt(retiro.value);
+
+    for (let key in decoracionesPrices) {
+        const qty = parseInt(document.getElementById(key).value);
+        if (qty > 0) {
+            total += qty * decoracionesPrices[key];
+        }
+    }
+
+    document.getElementById('total-display').innerText =
+        '$' + total.toLocaleString('es-AR');
+
+    return total;
+}
+
+function shareOnWhatsApp() {
+    const total = calculateTotal();
+    let msg = `Presupuesto Oh My Nails 💅\nTotal: $${total}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+}
